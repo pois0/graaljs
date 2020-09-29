@@ -1,0 +1,7 @@
+com.oracle.truffle.js.test
+com.oracle.truffle.js.test.external
+com.oracle.truffle.js.test.instrumentation
+com.oracle.truffle.js.test.threading
+GRAALJS
+TRUFFLE_TCK
+TRUFFLE_JS_SNAPSHOT_TOOL

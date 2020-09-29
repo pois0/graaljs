@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="data">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/test_nocompress.zip!/" />
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/test_encrypted.zip!/" />
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/evil_via_invalid_utf8.zip!/" />
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/evil.zip!/" />
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/test_mismatch_size.zip!/" />
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/test.zip!/" />
+      <root url="jar://$PROJECT_DIR$/graal-nodejs/deps/zlib/google/test/data/evil_via_absolute_file_name.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

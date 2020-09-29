@@ -1,0 +1,4 @@
+TRUFFLE_DSL_PROCESSOR
+JUNIT
+com.oracle.truffle.js
+com.oracle.truffle.js.parser

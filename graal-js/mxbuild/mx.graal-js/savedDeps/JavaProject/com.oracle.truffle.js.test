@@ -1,0 +1,6 @@
+TRUFFLE_DSL_PROCESSOR
+GRAAL_SDK
+JUNIT
+GRAALJS
+TRUFFLE_TCK
+com.oracle.truffle.js.snapshot

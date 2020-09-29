@@ -1,0 +1,5 @@
+logToConsole=False
+absolutePaths=False
+EXTRA_JAVA_HOMES=None
+PATH=/home/pois/Documents/programs/mx:/usr/local/cuda/bin:/home/pois/.cargo/bin:/home/pois/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/pois/android_home/tools:/home/pois/libs/Adobe/FDK/Tools/linux:/home/pois/libs/path
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/

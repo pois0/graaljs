@@ -1,0 +1,11 @@
+TRUFFLE_DSL_PROCESSOR
+TRUFFLE_JS_FACTORY_PROCESSOR
+com.oracle.js.parser
+com.oracle.truffle.js.annotations
+com.oracle.truffle.js.codec
+com.oracle.truffle.js.runtime.doubleconv
+TRUFFLE_API
+ASM-7.1
+ASM_COMMONS-7.1
+ASM_UTIL-7.1
+ICU4J

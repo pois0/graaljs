@@ -1,0 +1,1 @@
+{./->[file:README.md],native-image.properties->file:mx.graal-js/native-image.properties}

@@ -1,0 +1,5 @@
+com.oracle.truffle.js.scriptengine.test
+JUNIT
+GRAAL_SDK
+GRAALJS
+GRAALJS_SCRIPTENGINE

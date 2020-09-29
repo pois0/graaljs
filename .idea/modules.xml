@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.js.parser/com.oracle.js.parser.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.js.parser/com.oracle.js.parser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js/com.oracle.truffle.js.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js/com.oracle.truffle.js.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.annotations/com.oracle.truffle.js.annotations.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.annotations/com.oracle.truffle.js.annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.codec/com.oracle.truffle.js.codec.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.codec/com.oracle.truffle.js.codec.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.factory.processor/com.oracle.truffle.js.factory.processor.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.factory.processor/com.oracle.truffle.js.factory.processor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.jdk11/com.oracle.truffle.js.jdk11.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.jdk11/com.oracle.truffle.js.jdk11.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.jdk8/com.oracle.truffle.js.jdk8.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.jdk8/com.oracle.truffle.js.jdk8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.jmh/com.oracle.truffle.js.jmh.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.jmh/com.oracle.truffle.js.jmh.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.parser/com.oracle.truffle.js.parser.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.parser/com.oracle.truffle.js.parser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.runtime.doubleconv/com.oracle.truffle.js.runtime.doubleconv.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.runtime.doubleconv/com.oracle.truffle.js.runtime.doubleconv.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.scriptengine/com.oracle.truffle.js.scriptengine.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.scriptengine/com.oracle.truffle.js.scriptengine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.scriptengine.test/com.oracle.truffle.js.scriptengine.test.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.scriptengine.test/com.oracle.truffle.js.scriptengine.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.shell/com.oracle.truffle.js.shell.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.shell/com.oracle.truffle.js.shell.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.snapshot/com.oracle.truffle.js.snapshot.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.snapshot/com.oracle.truffle.js.snapshot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.stats/com.oracle.truffle.js.stats.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.stats/com.oracle.truffle.js.stats.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test/com.oracle.truffle.js.test.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test/com.oracle.truffle.js.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.external/com.oracle.truffle.js.test.external.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.external/com.oracle.truffle.js.test.external.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.instrumentation/com.oracle.truffle.js.test.instrumentation.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.instrumentation/com.oracle.truffle.js.test.instrumentation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.sdk/com.oracle.truffle.js.test.sdk.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.sdk/com.oracle.truffle.js.test.sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.threading/com.oracle.truffle.js.test.threading.iml" filepath="$PROJECT_DIR$/graal-js/src/com.oracle.truffle.js.test.threading/com.oracle.truffle.js.test.threading.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode/com.oracle.truffle.trufflenode.iml" filepath="$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode/com.oracle.truffle.trufflenode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.jdk11/com.oracle.truffle.trufflenode.jdk11.iml" filepath="$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.jdk11/com.oracle.truffle.trufflenode.jdk11.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.jdk8/com.oracle.truffle.trufflenode.jdk8.iml" filepath="$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.jdk8/com.oracle.truffle.trufflenode.jdk8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.jniboundaryprofiler/com.oracle.truffle.trufflenode.jniboundaryprofiler.iml" filepath="$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.jniboundaryprofiler/com.oracle.truffle.trufflenode.jniboundaryprofiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.test/com.oracle.truffle.trufflenode.test.iml" filepath="$PROJECT_DIR$/graal-nodejs/mx.graal-nodejs/com.oracle.truffle.trufflenode.test/com.oracle.truffle.trufflenode.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/graaljs.iml" filepath="$PROJECT_DIR$/.idea/graaljs.iml" />
+    </modules>
+  </component>
+</project>
