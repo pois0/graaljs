@@ -184,7 +184,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
 
     @TruffleBoundary
     private boolean setValueAndSpecialize(Object thisObj, Object value, Object receiver) {
-        return specialize(thisObj, value).setValue(thisObj, value, receiver, this, false);
+        SetCacheNode node = specialize(thisObj, value);
+        return node.setValue(thisObj, value, receiver, this, false);
     }
 
     @ExplodeLoop
@@ -269,8 +270,11 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
     }
 
     public abstract static class SetCacheNode extends PropertyCacheNode.CacheNode<SetCacheNode> {
-        protected SetCacheNode(ReceiverCheckNode receiverCheck) {
+        protected JSContext context;
+
+        protected SetCacheNode(JSContext context, ReceiverCheckNode receiverCheck) {
             super(receiverCheck);
+            this.context = context;
         }
 
         protected abstract boolean setValue(Object thisObj, Object value, Object receiver, PropertySetNode root, boolean guard);
@@ -294,16 +298,16 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
     }
 
     public abstract static class LinkedPropertySetNode extends SetCacheNode {
-        protected LinkedPropertySetNode(ReceiverCheckNode receiverCheck) {
-            super(receiverCheck);
+        protected LinkedPropertySetNode(JSContext context, ReceiverCheckNode receiverCheck) {
+            super(context, receiverCheck);
         }
     }
 
     public static final class ObjectPropertySetNode extends LinkedPropertySetNode {
         private final Property property;
 
-        public ObjectPropertySetNode(Property property, AbstractShapeCheckNode shapeCheck) {
-            super(shapeCheck);
+        public ObjectPropertySetNode(JSContext context, Property property, AbstractShapeCheckNode shapeCheck) {
+            super(context, shapeCheck);
             this.property = property;
             assert JSProperty.isData(property) && JSProperty.isWritable(property) && !JSProperty.isProxy(property) && !property.getLocation().isFinal();
         }
@@ -314,6 +318,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 DynamicObject store = receiverCheck.getStore(thisObj);
                 try {
                     property.set(store, value, receiverCheck.getShape());
+                    context.trackAssignment(thisObj, property, value);
                 } catch (IncompatibleLocationException | FinalLocationException e) {
                     throw Errors.shouldNotReachHere(e);
                 }
@@ -334,8 +339,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         private final boolean isStrict;
         private final BranchProfile errorBranch = BranchProfile.create();
 
-        public PropertyProxySetNode(Property property, AbstractShapeCheckNode shapeCheck, boolean isStrict) {
-            super(shapeCheck);
+        public PropertyProxySetNode(JSContext context, Property property, AbstractShapeCheckNode shapeCheck, boolean isStrict) {
+            super(context, shapeCheck);
             this.property = property;
             this.isStrict = isStrict;
             assert JSProperty.isData(property) && JSProperty.isWritable(property) && JSProperty.isProxy(property) && !property.getLocation().isFinal();
@@ -345,6 +350,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         protected boolean setValue(Object thisObj, Object value, Object receiver, PropertySetNode root, boolean guard) {
             DynamicObject store = receiverCheck.getStore(thisObj);
             boolean ret = ((PropertyProxy) property.get(store, guard)).set(store, value);
+            context.trackAssignment(thisObj, property, value);
             if (!ret && isStrict) {
                 errorBranch.enter();
                 throw Errors.createTypeErrorNotWritableProperty(property.getKey(), thisObj);
@@ -358,8 +364,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         private final Property property;
         private final IntLocation location;
 
-        public IntPropertySetNode(Property property, AbstractShapeCheckNode shapeCheck) {
-            super(shapeCheck);
+        public IntPropertySetNode(JSContext context, Property property, AbstractShapeCheckNode shapeCheck) {
+            super(context, shapeCheck);
             this.property = property;
             this.location = (IntLocation) property.getLocation();
             assert JSProperty.isData(property) && JSProperty.isWritable(property) && !property.getLocation().isFinal();
@@ -371,6 +377,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 DynamicObject store = receiverCheck.getStore(thisObj);
                 try {
                     property.set(store, value, receiverCheck.getShape());
+                    context.trackAssignment(thisObj, property, value);
                 } catch (IncompatibleLocationException | FinalLocationException e) {
                     throw Errors.shouldNotReachHere(e);
                 }
@@ -399,15 +406,17 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
 
     public static final class DoublePropertySetNode extends LinkedPropertySetNode {
         private final DoubleLocation location;
+        private final Object key;
 
         @CompilationFinal int valueProfile;
         private static final int INT = 1 << 0;
         private static final int DOUBLE = 1 << 1;
         private static final int OTHER = 1 << 2;
 
-        public DoublePropertySetNode(Property property, AbstractShapeCheckNode shapeCheck) {
-            super(shapeCheck);
+        public DoublePropertySetNode(JSContext context, Property property, AbstractShapeCheckNode shapeCheck) {
+            super(context, shapeCheck);
             this.location = (DoubleLocation) property.getLocation();
+            key = property.getKey();
             assert JSProperty.isData(property) && JSProperty.isWritable(property) && !property.getLocation().isFinal();
         }
 
@@ -436,6 +445,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setDouble(store, doubleValue, receiverCheck.getShape());
+                context.trackAssignment(thisObj, key, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -475,8 +485,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         private final Property property;
         private final BooleanLocation location;
 
-        public BooleanPropertySetNode(Property property, AbstractShapeCheckNode shapeCheck) {
-            super(shapeCheck);
+        public BooleanPropertySetNode(JSContext context, Property property, AbstractShapeCheckNode shapeCheck) {
+            super(context, shapeCheck);
             this.property = property;
             this.location = (BooleanLocation) property.getLocation();
             assert JSProperty.isData(property);
@@ -489,6 +499,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 DynamicObject store = receiverCheck.getStore(thisObj);
                 try {
                     property.set(store, value, receiverCheck.getShape());
+                    context.trackAssignment(thisObj, property, value);
                 } catch (IncompatibleLocationException | FinalLocationException e) {
                     throw Errors.shouldNotReachHere(e);
                 }
@@ -521,8 +532,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         @Child private JSFunctionCallNode callNode;
         private final BranchProfile undefinedSetterBranch = BranchProfile.create();
 
-        public AccessorPropertySetNode(Property property, ReceiverCheckNode receiverCheck, boolean isStrict) {
-            super(receiverCheck);
+        public AccessorPropertySetNode(JSContext context, Property property, ReceiverCheckNode receiverCheck, boolean isStrict) {
+            super(context, receiverCheck);
             assert JSProperty.isAccessor(property);
             this.property = property;
             this.isStrict = isStrict;
@@ -537,6 +548,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject setter = accessor.getSetter();
             if (setter != Undefined.instance) {
                 callNode.executeCall(JSArguments.createOneArg(receiver, setter, value));
+                // TODO
             } else {
                 undefinedSetterBranch.enter();
                 if (isStrict) {
@@ -633,12 +645,12 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
     public static class DataPropertySetNode extends LinkedPropertySetNode {
         @CompilationFinal protected DefinePropertyCache cache;
 
-        public DataPropertySetNode(ReceiverCheckNode receiverCheck) {
-            super(receiverCheck);
+        public DataPropertySetNode(JSContext context, ReceiverCheckNode receiverCheck) {
+            super(context, receiverCheck);
         }
 
-        public DataPropertySetNode(Object key, ReceiverCheckNode receiverCheck, Shape oldShape, Shape newShape, Property property) {
-            super(receiverCheck);
+        public DataPropertySetNode(JSContext context, Object key, ReceiverCheckNode receiverCheck, Shape oldShape, Shape newShape, Property property) {
+            super(context, receiverCheck);
             assert JSProperty.isData(property);
             assert property.getKey().equals(key) : "property=" + property + " key=" + key;
             assert property == newShape.getProperty(key);
@@ -659,6 +671,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedObject(store, value, resolved)) {
+                        context.trackAssignment(thisObj, cache.property, value);
                         return true;
                     }
                 }
@@ -882,6 +895,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             }
             assert res.acceptsValue(value);
             res.property.setSafe(obj, value, res.oldShape, res.newShape);
+            context.trackAssignment(obj, res.property, value);
             return true;
         }
 
@@ -908,8 +922,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
     public static final class ReadOnlyPropertySetNode extends LinkedPropertySetNode {
         private final boolean isStrict;
 
-        public ReadOnlyPropertySetNode(ReceiverCheckNode receiverCheck, boolean isStrict) {
-            super(receiverCheck);
+        public ReadOnlyPropertySetNode(JSContext context, ReceiverCheckNode receiverCheck, boolean isStrict) {
+            super(context, receiverCheck);
             this.isStrict = isStrict;
         }
 
@@ -927,8 +941,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
      */
     public static final class TypeErrorPropertySetNode extends LinkedPropertySetNode {
 
-        public TypeErrorPropertySetNode(AbstractShapeCheckNode shapeCheckNode) {
-            super(shapeCheckNode);
+        public TypeErrorPropertySetNode(JSContext context, AbstractShapeCheckNode shapeCheckNode) {
+            super(context, shapeCheckNode);
         }
 
         @Override
@@ -943,8 +957,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
      */
     public static final class ReferenceErrorPropertySetNode extends LinkedPropertySetNode {
 
-        public ReferenceErrorPropertySetNode(AbstractShapeCheckNode shapeCheckNode) {
-            super(shapeCheckNode);
+        public ReferenceErrorPropertySetNode(JSContext context, AbstractShapeCheckNode shapeCheckNode) {
+            super(context, shapeCheckNode);
         }
 
         @Override
@@ -955,8 +969,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
     }
 
     public static final class JSAdapterPropertySetNode extends LinkedPropertySetNode {
-        public JSAdapterPropertySetNode(ReceiverCheckNode receiverCheckNode) {
-            super(receiverCheckNode);
+        public JSAdapterPropertySetNode(JSContext context, ReceiverCheckNode receiverCheckNode) {
+            super(context, receiverCheckNode);
         }
 
         @Override
@@ -970,7 +984,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         @Child private JSProxyPropertySetNode proxySet;
 
         public JSProxyDispatcherPropertySetNode(JSContext context, ReceiverCheckNode receiverCheckNode, boolean isStrict) {
-            super(receiverCheckNode);
+            super(context, receiverCheckNode);
             this.proxySet = JSProxyPropertySetNode.create(context, isStrict);
         }
 
@@ -997,7 +1011,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         private final ConditionProfile isForeignObject = ConditionProfile.createBinaryProfile();
 
         public GenericPropertySetNode(JSContext context) {
-            super(null);
+            super(context, null);
             this.toObjectNode = JSToObjectNode.createToObjectNoCheck(context);
         }
 
@@ -1058,12 +1072,11 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
 
         @Child private ExportValueNode export;
         @CompilationFinal private boolean optimistic = true;
-        private final JSContext context;
         @Child private InteropLibrary interop;
         @Child private InteropLibrary setterInterop;
 
         public ForeignPropertySetNode(JSContext context) {
-            super(new ForeignLanguageCheckNode());
+            super(context, new ForeignLanguageCheckNode());
             this.context = context;
             this.export = ExportValueNode.create();
             this.interop = InteropLibrary.getFactory().createDispatched(3);
@@ -1169,8 +1182,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
 
     public static final class ArrayBufferViewNonIntegerIndexSetNode extends LinkedPropertySetNode {
 
-        public ArrayBufferViewNonIntegerIndexSetNode(AbstractShapeCheckNode shapeCheck) {
-            super(shapeCheck);
+        public ArrayBufferViewNonIntegerIndexSetNode(JSContext context, AbstractShapeCheckNode shapeCheck) {
+            super(context, shapeCheck);
         }
 
         @Override
@@ -1191,8 +1204,8 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         private final boolean isStrict;
         private final BranchProfile errorBranch = BranchProfile.create();
 
-        public ArrayLengthPropertySetNode(Property property, AbstractShapeCheckNode shapeCheck, boolean isStrict) {
-            super(shapeCheck);
+        public ArrayLengthPropertySetNode(JSContext context, Property property, AbstractShapeCheckNode shapeCheck, boolean isStrict) {
+            super(context, shapeCheck);
             assert JSProperty.isData(property) && JSProperty.isWritable(property) && isArrayLengthProperty(property);
             this.property = property;
             this.isStrict = isStrict;
@@ -1203,6 +1216,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         protected boolean setValue(Object thisObj, Object value, Object receiver, PropertySetNode root, boolean guard) {
             DynamicObject store = receiverCheck.getStore(thisObj);
             boolean ret = ((PropertyProxy) property.get(store, guard)).set(store, value);
+            context.trackAssignment(thisObj, property, value);
             if (!ret && isStrict) {
                 errorBranch.enter();
                 throw Errors.createTypeErrorNotWritableProperty(property.getKey(), thisObj);
@@ -1246,14 +1260,14 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             return createCachedDataPropertyNodeJSObject(thisObj, depth, value, shapeCheck, property);
         } else {
             assert JSProperty.isAccessor(property);
-            return new AccessorPropertySetNode(property, shapeCheck, isStrict());
+            return new AccessorPropertySetNode(context, property, shapeCheck, isStrict());
         }
     }
 
     private SetCacheNode createCachedDataPropertyNodeJSObject(JSDynamicObject thisObj, int depth, Object value, AbstractShapeCheckNode shapeCheck, Property property) {
         assert !JSProperty.isConst(property) || (depth == 0 && isGlobal() && property.getLocation().isValue() && property.getLocation().get(null) == Dead.instance()) : "const assignment";
         if (!JSProperty.isWritable(property)) {
-            return new ReadOnlyPropertySetNode(shapeCheck, isStrict());
+            return new ReadOnlyPropertySetNode(context, shapeCheck, isStrict());
         } else if (superProperty) {
             // define the property on the receiver; currently not handled, rewrite to generic
             return createGenericPropertyNode();
@@ -1264,9 +1278,9 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             return createUndefinedPropertyNode(thisObj, thisObj, depth, value);
         } else if (JSProperty.isProxy(property)) {
             if (isArrayLengthProperty(property) && JSArray.isJSFastArray(thisObj)) {
-                return new ArrayLengthPropertySetNode(property, shapeCheck, isStrict());
+                return new ArrayLengthPropertySetNode(context, property, shapeCheck, isStrict());
             }
-            return new PropertyProxySetNode(property, shapeCheck, isStrict());
+            return new PropertyProxySetNode(context, property, shapeCheck, isStrict());
         } else {
             assert JSProperty.isWritable(property) && depth == 0 && !JSProperty.isProxy(property);
             if (property.getLocation().isDeclared()) {
@@ -1276,13 +1290,13 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             }
 
             if (property.getLocation() instanceof IntLocation) {
-                return new IntPropertySetNode(property, shapeCheck);
+                return new IntPropertySetNode(context, property, shapeCheck);
             } else if (property.getLocation() instanceof DoubleLocation) {
-                return new DoublePropertySetNode(property, shapeCheck);
+                return new DoublePropertySetNode(context, property, shapeCheck);
             } else if (property.getLocation() instanceof BooleanLocation) {
-                return new BooleanPropertySetNode(property, shapeCheck);
+                return new BooleanPropertySetNode(context, property, shapeCheck);
             } else {
-                return new ObjectPropertySetNode(property, shapeCheck);
+                return new ObjectPropertySetNode(context, property, shapeCheck);
             }
         }
     }
@@ -1291,7 +1305,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         Shape oldShape = shapeCheck.getShape();
         Shape newShape = declaration ? JSObjectUtil.shapeDefineDeclaredDataProperty(context, oldShape, key, value, attributeFlags)
                         : JSObjectUtil.shapeDefineDataProperty(context, oldShape, key, value, attributeFlags);
-        return createResolvedDefinePropertyNode(key, shapeCheck, oldShape, newShape, attributeFlags);
+        return createResolvedDefinePropertyNode(context, key, shapeCheck, oldShape, newShape, attributeFlags);
     }
 
     private static SetCacheNode createRedefinePropertyNode(Object key, ReceiverCheckNode shapeCheck, Shape oldShape, Property property, Object value, JSContext context) {
@@ -1299,31 +1313,31 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         assert property == oldShape.getProperty(key);
 
         Shape newShape = JSObjectUtil.shapeDefineDataProperty(context, oldShape, key, value, property.getFlags());
-        return createResolvedDefinePropertyNode(key, shapeCheck, oldShape, newShape, property.getFlags());
+        return createResolvedDefinePropertyNode(context, key, shapeCheck, oldShape, newShape, property.getFlags());
     }
 
     private SetCacheNode createCachedDataPropertyGeneralize(JSDynamicObject thisObj, int depth) {
         Shape oldShape = thisObj.getShape();
         AbstractShapeCheckNode shapeCheck = createShapeCheckNode(oldShape, thisObj, depth, false, false);
-        return new DataPropertySetNode(shapeCheck);
+        return new DataPropertySetNode(context, shapeCheck);
     }
 
     private SetCacheNode createCachedPropertyNodeNotJSObject(Property property, Object thisObj, int depth) {
         ReceiverCheckNode receiverCheck = createPrimitiveReceiverCheck(thisObj, depth);
 
         if (JSProperty.isData(property)) {
-            return new ReadOnlyPropertySetNode(receiverCheck, isStrict());
+            return new ReadOnlyPropertySetNode(context, receiverCheck, isStrict());
         } else {
             assert JSProperty.isAccessor(property);
-            return new AccessorPropertySetNode(property, receiverCheck, isStrict());
+            return new AccessorPropertySetNode(context, property, receiverCheck, isStrict());
         }
     }
 
-    private static SetCacheNode createResolvedDefinePropertyNode(Object key, ReceiverCheckNode receiverCheck, Shape oldShape, Shape newShape, int attributeFlags) {
+    private static SetCacheNode createResolvedDefinePropertyNode(JSContext context, Object key, ReceiverCheckNode receiverCheck, Shape oldShape, Shape newShape, int attributeFlags) {
         Property prop = newShape.getProperty(key);
         assert (prop.getFlags() & (JSAttributes.ATTRIBUTES_MASK | JSProperty.CONST)) == attributeFlags;
 
-        return new DataPropertySetNode(key, receiverCheck, oldShape, newShape, prop);
+        return new DataPropertySetNode(context, key, receiverCheck, oldShape, newShape, prop);
     }
 
     @Override
@@ -1338,23 +1352,23 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             AbstractShapeCheckNode shapeCheck = createShapeCheckNode(cacheShape, thisJSObj, depth, false, true);
             if (JSAdapter.isJSAdapter(store)) {
                 ReceiverCheckNode receiverCheck = (depth == 0) ? new JSClassCheckNode(JSObject.getJSClass(thisJSObj)) : shapeCheck;
-                return new JSAdapterPropertySetNode(receiverCheck);
+                return new JSAdapterPropertySetNode(context, receiverCheck);
             } else if (isStrict() && isGlobal() && !JSObject.hasProperty(thisJSObj, key)) {
-                return new ReferenceErrorPropertySetNode(shapeCheck);
+                return new ReferenceErrorPropertySetNode(context, shapeCheck);
             } else if (JSProxy.isJSProxy(store) && JSRuntime.isPropertyKey(key)) {
                 ReceiverCheckNode receiverCheck = (depth == 0) ? new JSClassCheckNode(JSObject.getJSClass(thisJSObj)) : shapeCheck;
                 return new JSProxyDispatcherPropertySetNode(context, receiverCheck, isStrict());
             } else if (!JSRuntime.isObject(thisJSObj)) {
-                return new TypeErrorPropertySetNode(shapeCheck);
+                return new TypeErrorPropertySetNode(context, shapeCheck);
             } else if (JSArrayBufferView.isJSArrayBufferView(store) && isNonIntegerIndex(key)) {
-                return new ArrayBufferViewNonIntegerIndexSetNode(shapeCheck);
+                return new ArrayBufferViewNonIntegerIndexSetNode(context, shapeCheck);
             } else if (superProperty) {
                 // define the property on the receiver; currently not handled, rewrite to generic
                 return createGenericPropertyNode();
             } else if (JSShape.isExtensible(cacheShape) || key instanceof HiddenKey) {
                 return createDefinePropertyNode(key, shapeCheck, value, context, getAttributeFlags(), isDeclaration());
             } else {
-                return new ReadOnlyPropertySetNode(createShapeCheckNode(cacheShape, thisJSObj, depth, false, false), isStrict());
+                return new ReadOnlyPropertySetNode(context, createShapeCheckNode(cacheShape, thisJSObj, depth, false, false), isStrict());
             }
         } else if (JSProxy.isJSProxy(store)) {
             ReceiverCheckNode receiverCheck = createPrimitiveReceiverCheck(thisObj, depth);
@@ -1365,7 +1379,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 // Nashorn never throws when setting inexistent properties on Java objects
                 doThrow = false;
             }
-            return new ReadOnlyPropertySetNode(new InstanceofCheckNode(thisObj.getClass(), context), doThrow);
+            return new ReadOnlyPropertySetNode(context, new InstanceofCheckNode(thisObj.getClass(), context), doThrow);
         }
     }
 

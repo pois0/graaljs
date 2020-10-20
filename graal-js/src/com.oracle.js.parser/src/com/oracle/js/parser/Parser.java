@@ -4013,6 +4013,7 @@ public class Parser extends AbstractParser {
 
         final boolean computed = type == LBRACKET;
         if (type == IDENT || (isIdentifier() && !(type == GET || type == SET))) {
+            // 一切の問題を起こさないidentifierであった
             isIdentifier = true;
             propertyName = getIdent().setIsPropertyName();
         } else if (type == GET || type == SET) {
@@ -4020,6 +4021,7 @@ public class Parser extends AbstractParser {
             next();
 
             if (type != COLON && type != COMMARIGHT && type != RBRACE && ((type != ASSIGN && type != LPAREN) || !isES6())) {
+                // MethodDefinitionのgetterまたはsetterであった
                 final long getOrSetToken = propertyToken;
                 if (getOrSet == GET) {
                     final PropertyFunction getter = propertyGetterFunction(getOrSetToken, functionLine, yield, await, false);
@@ -4030,9 +4032,12 @@ public class Parser extends AbstractParser {
                 }
             }
 
+            // ヒットしていた`get`または`set`はIdentifierだった
+
             isIdentifier = true;
             propertyName = new IdentNode(propertyToken, finish, getOrSet.getName()).setIsPropertyName();
         } else if (type == ELLIPSIS && ES8_REST_SPREAD_PROPERTY && isES2017() && !(generator || async)) {
+            // `... AssignmentExpression`にマッチした
             long spreadToken = Token.recast(propertyToken, TokenType.SPREAD_OBJECT);
             next();
             Expression assignmentExpression = assignmentExpression(true, yield, await);
@@ -4053,8 +4058,10 @@ public class Parser extends AbstractParser {
         boolean proto = false;
         boolean isAnonymousFunctionDefinition = false;
         if (type == LPAREN && isES6()) {
+            // Arrow Functionである
             propertyValue = propertyMethodFunction(propertyName, propertyToken, functionLine, generator, FunctionNode.IS_METHOD, computed, async).functionNode;
         } else if (isIdentifier && (type == COMMARIGHT || type == RBRACE || type == ASSIGN) && isES6()) {
+            // IdentifierReferenceもしくばCoverInitializedNameにマッチ
             IdentNode ident = (IdentNode) propertyName;
             verifyIdent(ident, yield, await);
             propertyValue = createIdentNode(propertyToken, finish, ident.getPropertyName());
@@ -4067,6 +4074,7 @@ public class Parser extends AbstractParser {
                 propertyValue = verifyAssignment(assignToken, propertyValue, rhs, true);
             }
         } else {
+            // `PropertyName : Assignment`にマッチ
             expect(COLON);
 
             if (!computed && PROTO_NAME.equals(((PropertyKey) propertyName).getPropertyName())) {
@@ -5799,7 +5807,9 @@ public class Parser extends AbstractParser {
      * AssignmentExpression.
      *
      * AssignmentExpression[In, Yield] : ConditionalExpression[?In, ?Yield] [+Yield]
-     * YieldExpression[?In] ArrowFunction[?In, ?Yield] AsyncArrowFunction
+     * YieldExpression[?In]
+     * ArrowFunction[?In, ?Yield]
+     * AsyncArrowFunction
      * LeftHandSideExpression[?Yield] = AssignmentExpression[?In, ?Yield]
      * LeftHandSideExpression[?Yield] AssignmentOperator AssignmentExpression[?In, ?Yield]
      */

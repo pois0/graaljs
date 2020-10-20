@@ -165,16 +165,6 @@ public final class GlobalScopeLookupNodeGen extends GlobalScopeLookupNode implem
         return NodeCost.POLYMORPHIC;
     }
 
-    void removeAbsent_() {
-        Lock lock = getLock();
-        lock.lock();
-        try {
-            this.state_ = this.state_ & 0xfffffffe /* remove-active doAbsent(DynamicObject, Assumption) */;
-        } finally {
-            lock.unlock();
-        }
-    }
-
     void removeCached_(Object s2_) {
         Lock lock = getLock();
         lock.lock();
@@ -196,6 +186,16 @@ public final class GlobalScopeLookupNodeGen extends GlobalScopeLookupNode implem
             if (this.cached_cache == null) {
                 this.state_ = this.state_ & 0xfffffffd /* remove-active doCached(DynamicObject, Shape, boolean, boolean, boolean, int) */;
             }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    void removeAbsent_() {
+        Lock lock = getLock();
+        lock.lock();
+        try {
+            this.state_ = this.state_ & 0xfffffffe /* remove-active doAbsent(DynamicObject, Assumption) */;
         } finally {
             lock.unlock();
         }

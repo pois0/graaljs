@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.js.nodes.JSGuards;
 import com.oracle.truffle.js.nodes.JavaScriptNode;
 import com.oracle.truffle.js.nodes.function.JSFunctionCallNode;
+import com.oracle.truffle.js.nodes.unary.IsCallableNode;
 import com.oracle.truffle.js.runtime.JSContext;
 import com.oracle.truffle.js.runtime.objects.IteratorRecord;
 import java.util.ArrayList;
@@ -23,8 +24,7 @@ import java.util.concurrent.locks.Lock;
 public final class GetIteratorNodeGen extends GetIteratorNode implements Provider {
 
     @CompilationFinal private volatile int state_;
-    @Child private JSFunctionCallNode getIterator_methodCallNode_;
-    @Child private IsJSObjectNode getIterator_isObjectNode_;
+    @Child private GetIteratorData getIterator_cache;
     @Child private EnumerateNode foreignIterable_enumerateNode_;
 
     private GetIteratorNodeGen(JSContext context, JavaScriptNode objectNode) {
@@ -34,10 +34,13 @@ public final class GetIteratorNodeGen extends GetIteratorNode implements Provide
     @Override
     public IteratorRecord execute(Object objectNodeValue) {
         int state = state_;
-        if (state != 0 /* is-active doGetIterator(Object, JSFunctionCallNode, IsJSObjectNode) || doForeignIterable(Object, EnumerateNode) */) {
-            if ((state & 0b1) != 0 /* is-active doGetIterator(Object, JSFunctionCallNode, IsJSObjectNode) */) {
-                if ((!(JSGuards.isForeignObject(objectNodeValue)))) {
-                    return doGetIterator(objectNodeValue, this.getIterator_methodCallNode_, this.getIterator_isObjectNode_);
+        if (state != 0 /* is-active doGetIterator(Object, IsCallableNode, JSFunctionCallNode, IsJSObjectNode) || doForeignIterable(Object, EnumerateNode) */) {
+            if ((state & 0b1) != 0 /* is-active doGetIterator(Object, IsCallableNode, JSFunctionCallNode, IsJSObjectNode) */) {
+                GetIteratorData s1_ = this.getIterator_cache;
+                if (s1_ != null) {
+                    if ((!(JSGuards.isForeignObject(objectNodeValue)))) {
+                        return doGetIterator(objectNodeValue, s1_.isCallableNode_, s1_.methodCallNode_, s1_.isObjectNode_);
+                    }
                 }
             }
             if ((state & 0b10) != 0 /* is-active doForeignIterable(Object, EnumerateNode) */) {
@@ -54,10 +57,13 @@ public final class GetIteratorNodeGen extends GetIteratorNode implements Provide
     public IteratorRecord execute(VirtualFrame frameValue) {
         int state = state_;
         Object objectNodeValue_ = super.objectNode.execute(frameValue);
-        if (state != 0 /* is-active doGetIterator(Object, JSFunctionCallNode, IsJSObjectNode) || doForeignIterable(Object, EnumerateNode) */) {
-            if ((state & 0b1) != 0 /* is-active doGetIterator(Object, JSFunctionCallNode, IsJSObjectNode) */) {
-                if ((!(JSGuards.isForeignObject(objectNodeValue_)))) {
-                    return doGetIterator(objectNodeValue_, this.getIterator_methodCallNode_, this.getIterator_isObjectNode_);
+        if (state != 0 /* is-active doGetIterator(Object, IsCallableNode, JSFunctionCallNode, IsJSObjectNode) || doForeignIterable(Object, EnumerateNode) */) {
+            if ((state & 0b1) != 0 /* is-active doGetIterator(Object, IsCallableNode, JSFunctionCallNode, IsJSObjectNode) */) {
+                GetIteratorData s1_ = this.getIterator_cache;
+                if (s1_ != null) {
+                    if ((!(JSGuards.isForeignObject(objectNodeValue_)))) {
+                        return doGetIterator(objectNodeValue_, s1_.isCallableNode_, s1_.methodCallNode_, s1_.isObjectNode_);
+                    }
                 }
             }
             if ((state & 0b10) != 0 /* is-active doForeignIterable(Object, EnumerateNode) */) {
@@ -83,12 +89,15 @@ public final class GetIteratorNodeGen extends GetIteratorNode implements Provide
         int state = state_;
         try {
             if ((!(JSGuards.isForeignObject(objectNodeValue)))) {
-                this.getIterator_methodCallNode_ = super.insert((JSFunctionCallNode.createCall()));
-                this.getIterator_isObjectNode_ = super.insert((IsJSObjectNode.create()));
-                this.state_ = state = state | 0b1 /* add-active doGetIterator(Object, JSFunctionCallNode, IsJSObjectNode) */;
+                GetIteratorData s1_ = super.insert(new GetIteratorData());
+                s1_.isCallableNode_ = s1_.insertAccessor((IsCallableNode.create()));
+                s1_.methodCallNode_ = s1_.insertAccessor((JSFunctionCallNode.createCall()));
+                s1_.isObjectNode_ = s1_.insertAccessor((IsJSObjectNode.create()));
+                this.getIterator_cache = s1_;
+                this.state_ = state = state | 0b1 /* add-active doGetIterator(Object, IsCallableNode, JSFunctionCallNode, IsJSObjectNode) */;
                 lock.unlock();
                 hasLock = false;
-                return doGetIterator(objectNodeValue, this.getIterator_methodCallNode_, this.getIterator_isObjectNode_);
+                return doGetIterator(objectNodeValue, s1_.isCallableNode_, s1_.methodCallNode_, s1_.isObjectNode_);
             }
             if ((JSGuards.isForeignObject(objectNodeValue))) {
                 this.foreignIterable_enumerateNode_ = super.insert((createEnumerateValues()));
@@ -124,10 +133,13 @@ public final class GetIteratorNodeGen extends GetIteratorNode implements Provide
         int state = state_;
         s = new Object[3];
         s[0] = "doGetIterator";
-        if ((state & 0b1) != 0 /* is-active doGetIterator(Object, JSFunctionCallNode, IsJSObjectNode) */) {
+        if ((state & 0b1) != 0 /* is-active doGetIterator(Object, IsCallableNode, JSFunctionCallNode, IsJSObjectNode) */) {
             s[1] = (byte)0b01 /* active */;
             ArrayList<Object> cached = new ArrayList<>();
-            cached.add(Arrays.asList(this.getIterator_methodCallNode_, this.getIterator_isObjectNode_));
+            GetIteratorData s1_ = this.getIterator_cache;
+            if (s1_ != null) {
+                cached.add(Arrays.asList(s1_.isCallableNode_, s1_.methodCallNode_, s1_.isObjectNode_));
+            }
             s[2] = cached;
         } else {
             s[1] = (byte)0b00 /* inactive */;
@@ -151,4 +163,24 @@ public final class GetIteratorNodeGen extends GetIteratorNode implements Provide
         return new GetIteratorNodeGen(context, objectNode);
     }
 
+    @GeneratedBy(GetIteratorNode.class)
+    private static final class GetIteratorData extends Node {
+
+        @Child IsCallableNode isCallableNode_;
+        @Child JSFunctionCallNode methodCallNode_;
+        @Child IsJSObjectNode isObjectNode_;
+
+        GetIteratorData() {
+        }
+
+        @Override
+        public NodeCost getCost() {
+            return NodeCost.NONE;
+        }
+
+        <T extends Node> T insertAccessor(T node) {
+            return super.insert(node);
+        }
+
+    }
 }

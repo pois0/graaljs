@@ -24,6 +24,8 @@ import com.oracle.truffle.js.lang.JavaScriptLanguage;
 import com.oracle.truffle.js.nodes.JSGuards;
 import com.oracle.truffle.js.nodes.access.ReadElementNode;
 import com.oracle.truffle.js.nodes.access.WriteElementNode;
+import com.oracle.truffle.js.nodes.interop.ArrayElementInfoNode;
+import com.oracle.truffle.js.nodes.interop.ArrayElementInfoNodeGen;
 import com.oracle.truffle.js.nodes.interop.ExportValueNode;
 import com.oracle.truffle.js.nodes.interop.ExportValueNodeGen;
 import com.oracle.truffle.js.nodes.interop.ImportValueNode;
@@ -75,6 +77,7 @@ final class JSArrayObjectGen {
 
             @CompilationFinal private volatile int state_;
             @Child private KeyInfoNode keyInfo;
+            @Child private ArrayElementInfoNode elementInfo;
             @CompilationFinal private LanguageReference<JavaScriptLanguage> javaScriptLanguageReference_;
             @CompilationFinal private ContextReference<JSRealm> javaScriptLanguageContextReference_;
             @Child private ReadElementNode readMemberNode__readNode_;
@@ -650,11 +653,11 @@ final class JSArrayObjectGen {
                 assert assertAdopted();
                 JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
                 int state = state_;
-                if ((state & 0b10000000000000) != 0 /* is-active writeArrayElement(JSArrayObject, long, Object, KeyInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */) {
+                if ((state & 0b10000000000000) != 0 /* is-active writeArrayElement(JSArrayObject, long, Object, ArrayElementInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */) {
                     {
                         LanguageReference<JavaScriptLanguage> javaScriptLanguageReference__ = this.javaScriptLanguageReference_;
                         LanguageReference<JavaScriptLanguage> writeArrayElementNode__languageRef__ = javaScriptLanguageReference__;
-                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.keyInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
+                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.elementInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
                         return;
                     }
                 }
@@ -671,8 +674,8 @@ final class JSArrayObjectGen {
                 try {
                     {
                         LanguageReference<JavaScriptLanguage> writeArrayElementNode__languageRef__ = null;
-                        if (this.keyInfo == null) {
-                            this.keyInfo = super.insert((KeyInfoNodeGen.create()));
+                        if (this.elementInfo == null) {
+                            this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
                         }
                         this.writeArrayElementNode__castValueNode_ = super.insert((ImportValueNode.create()));
                         LanguageReference<JavaScriptLanguage> javaScriptLanguageReference__1 = this.javaScriptLanguageReference_;
@@ -681,10 +684,10 @@ final class JSArrayObjectGen {
                         }
                         writeArrayElementNode__languageRef__ = javaScriptLanguageReference__1;
                         this.writeArrayElementNode__writeNode_ = super.insert((WriteElementNode.createCachedInterop(writeArrayElementNode__languageRef__)));
-                        this.state_ = state = state | 0b10000000000000 /* add-active writeArrayElement(JSArrayObject, long, Object, KeyInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */;
+                        this.state_ = state = state | 0b10000000000000 /* add-active writeArrayElement(JSArrayObject, long, Object, ArrayElementInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */;
                         lock.unlock();
                         hasLock = false;
-                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.keyInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
+                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.elementInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
                         return;
                     }
                 } finally {
@@ -700,8 +703,8 @@ final class JSArrayObjectGen {
                 assert assertAdopted();
                 JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
                 int state = state_;
-                if ((state & 0b100000000000000) != 0 /* is-active isArrayElementModifiable(JSArrayObject, long, KeyInfoNode) */) {
-                    return arg0Value.isArrayElementModifiable(arg1Value, this.keyInfo);
+                if ((state & 0b100000000000000) != 0 /* is-active isArrayElementModifiable(JSArrayObject, long, ArrayElementInfoNode) */) {
+                    return arg0Value.isArrayElementModifiable(arg1Value, this.elementInfo);
                 }
                 CompilerDirectives.transferToInterpreterAndInvalidate();
                 return isArrayElementModifiableNode_AndSpecialize(arg0Value, arg1Value);
@@ -713,13 +716,13 @@ final class JSArrayObjectGen {
                 lock.lock();
                 int state = state_;
                 try {
-                    if (this.keyInfo == null) {
-                        this.keyInfo = super.insert((KeyInfoNodeGen.create()));
+                    if (this.elementInfo == null) {
+                        this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
                     }
-                    this.state_ = state = state | 0b100000000000000 /* add-active isArrayElementModifiable(JSArrayObject, long, KeyInfoNode) */;
+                    this.state_ = state = state | 0b100000000000000 /* add-active isArrayElementModifiable(JSArrayObject, long, ArrayElementInfoNode) */;
                     lock.unlock();
                     hasLock = false;
-                    return arg0Value.isArrayElementModifiable(arg1Value, this.keyInfo);
+                    return arg0Value.isArrayElementModifiable(arg1Value, this.elementInfo);
                 } finally {
                     if (hasLock) {
                         lock.unlock();
@@ -733,8 +736,8 @@ final class JSArrayObjectGen {
                 assert assertAdopted();
                 JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
                 int state = state_;
-                if ((state & 0b1000000000000000) != 0 /* is-active isArrayElementInsertable(JSArrayObject, long, KeyInfoNode) */) {
-                    return arg0Value.isArrayElementInsertable(arg1Value, this.keyInfo);
+                if ((state & 0b1000000000000000) != 0 /* is-active isArrayElementInsertable(JSArrayObject, long, ArrayElementInfoNode) */) {
+                    return arg0Value.isArrayElementInsertable(arg1Value, this.elementInfo);
                 }
                 CompilerDirectives.transferToInterpreterAndInvalidate();
                 return isArrayElementInsertableNode_AndSpecialize(arg0Value, arg1Value);
@@ -746,13 +749,13 @@ final class JSArrayObjectGen {
                 lock.lock();
                 int state = state_;
                 try {
-                    if (this.keyInfo == null) {
-                        this.keyInfo = super.insert((KeyInfoNodeGen.create()));
+                    if (this.elementInfo == null) {
+                        this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
                     }
-                    this.state_ = state = state | 0b1000000000000000 /* add-active isArrayElementInsertable(JSArrayObject, long, KeyInfoNode) */;
+                    this.state_ = state = state | 0b1000000000000000 /* add-active isArrayElementInsertable(JSArrayObject, long, ArrayElementInfoNode) */;
                     lock.unlock();
                     hasLock = false;
-                    return arg0Value.isArrayElementInsertable(arg1Value, this.keyInfo);
+                    return arg0Value.isArrayElementInsertable(arg1Value, this.elementInfo);
                 } finally {
                     if (hasLock) {
                         lock.unlock();
@@ -761,18 +764,72 @@ final class JSArrayObjectGen {
             }
 
             @Override
-            public boolean isArrayElementRemovable(Object receiver, long index) {
-                assert this.accepts(receiver) : "Invalid library usage. Library does not accept given receiver.";
+            public boolean isArrayElementRemovable(Object arg0Value_, long arg1Value) {
+                assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 assert assertAdopted();
-                return (((JSArrayObject) receiver)).isArrayElementRemovable(index);
+                JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
+                int state = state_;
+                if ((state & 0x10000) != 0 /* is-active isArrayElementRemovable(JSArrayObject, long, ArrayElementInfoNode) */) {
+                    return arg0Value.isArrayElementRemovable(arg1Value, this.elementInfo);
+                }
+                CompilerDirectives.transferToInterpreterAndInvalidate();
+                return isArrayElementRemovableNode_AndSpecialize(arg0Value, arg1Value);
+            }
+
+            private boolean isArrayElementRemovableNode_AndSpecialize(JSArrayObject arg0Value, long arg1Value) {
+                Lock lock = getLock();
+                boolean hasLock = true;
+                lock.lock();
+                int state = state_;
+                try {
+                    if (this.elementInfo == null) {
+                        this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
+                    }
+                    this.state_ = state = state | 0x10000 /* add-active isArrayElementRemovable(JSArrayObject, long, ArrayElementInfoNode) */;
+                    lock.unlock();
+                    hasLock = false;
+                    return arg0Value.isArrayElementRemovable(arg1Value, this.elementInfo);
+                } finally {
+                    if (hasLock) {
+                        lock.unlock();
+                    }
+                }
             }
 
             @Override
-            public void removeArrayElement(Object receiver, long index) throws UnsupportedMessageException, InvalidArrayIndexException {
-                assert this.accepts(receiver) : "Invalid library usage. Library does not accept given receiver.";
+            public void removeArrayElement(Object arg0Value_, long arg1Value) throws UnsupportedMessageException, InvalidArrayIndexException {
+                assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 assert assertAdopted();
-                (((JSArrayObject) receiver)).removeArrayElement(index);
+                JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
+                int state = state_;
+                if ((state & 0x20000) != 0 /* is-active removeArrayElement(JSArrayObject, long, ArrayElementInfoNode) */) {
+                    arg0Value.removeArrayElement(arg1Value, this.elementInfo);
+                    return;
+                }
+                CompilerDirectives.transferToInterpreterAndInvalidate();
+                removeArrayElementNode_AndSpecialize(arg0Value, arg1Value);
                 return;
+            }
+
+            private void removeArrayElementNode_AndSpecialize(JSArrayObject arg0Value, long arg1Value) throws UnsupportedMessageException, InvalidArrayIndexException {
+                Lock lock = getLock();
+                boolean hasLock = true;
+                lock.lock();
+                int state = state_;
+                try {
+                    if (this.elementInfo == null) {
+                        this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
+                    }
+                    this.state_ = state = state | 0x20000 /* add-active removeArrayElement(JSArrayObject, long, ArrayElementInfoNode) */;
+                    lock.unlock();
+                    hasLock = false;
+                    arg0Value.removeArrayElement(arg1Value, this.elementInfo);
+                    return;
+                } finally {
+                    if (hasLock) {
+                        lock.unlock();
+                    }
+                }
             }
 
         }
@@ -982,7 +1039,7 @@ final class JSArrayObjectGen {
             public void writeArrayElement(Object arg0Value_, long arg1Value, Object arg2Value) throws InvalidArrayIndexException, UnsupportedMessageException {
                 assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
-                arg0Value.writeArrayElement(arg1Value, arg2Value, (KeyInfoNodeGen.getUncached()), (ImportValueNodeGen.getUncached()), this.javaScriptLanguageReference_, (JSObject.getUncachedWrite()));
+                arg0Value.writeArrayElement(arg1Value, arg2Value, (ArrayElementInfoNodeGen.getUncached()), (ImportValueNodeGen.getUncached()), this.javaScriptLanguageReference_, (JSObject.getUncachedWrite()));
                 return;
             }
 
@@ -991,7 +1048,7 @@ final class JSArrayObjectGen {
             public boolean isArrayElementModifiable(Object arg0Value_, long arg1Value) {
                 assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
-                return arg0Value.isArrayElementModifiable(arg1Value, (KeyInfoNodeGen.getUncached()));
+                return arg0Value.isArrayElementModifiable(arg1Value, (ArrayElementInfoNodeGen.getUncached()));
             }
 
             @TruffleBoundary
@@ -999,21 +1056,23 @@ final class JSArrayObjectGen {
             public boolean isArrayElementInsertable(Object arg0Value_, long arg1Value) {
                 assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
-                return arg0Value.isArrayElementInsertable(arg1Value, (KeyInfoNodeGen.getUncached()));
+                return arg0Value.isArrayElementInsertable(arg1Value, (ArrayElementInfoNodeGen.getUncached()));
             }
 
             @TruffleBoundary
             @Override
-            public boolean isArrayElementRemovable(Object receiver, long index) {
-                assert this.accepts(receiver) : "Invalid library usage. Library does not accept given receiver.";
-                return ((JSArrayObject) receiver) .isArrayElementRemovable(index);
+            public boolean isArrayElementRemovable(Object arg0Value_, long arg1Value) {
+                assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
+                JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
+                return arg0Value.isArrayElementRemovable(arg1Value, (ArrayElementInfoNodeGen.getUncached()));
             }
 
             @TruffleBoundary
             @Override
-            public void removeArrayElement(Object receiver, long index) throws UnsupportedMessageException, InvalidArrayIndexException {
-                assert this.accepts(receiver) : "Invalid library usage. Library does not accept given receiver.";
-                ((JSArrayObject) receiver) .removeArrayElement(index);
+            public void removeArrayElement(Object arg0Value_, long arg1Value) throws UnsupportedMessageException, InvalidArrayIndexException {
+                assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
+                JSArrayObject arg0Value = ((JSArrayObject) arg0Value_);
+                arg0Value.removeArrayElement(arg1Value, (ArrayElementInfoNodeGen.getUncached()));
                 return;
             }
 

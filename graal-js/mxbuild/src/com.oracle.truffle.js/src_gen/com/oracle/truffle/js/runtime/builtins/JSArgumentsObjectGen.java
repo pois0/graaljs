@@ -21,6 +21,8 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.js.lang.JavaScriptLanguage;
 import com.oracle.truffle.js.nodes.access.ReadElementNode;
 import com.oracle.truffle.js.nodes.access.WriteElementNode;
+import com.oracle.truffle.js.nodes.interop.ArrayElementInfoNode;
+import com.oracle.truffle.js.nodes.interop.ArrayElementInfoNodeGen;
 import com.oracle.truffle.js.nodes.interop.ExportValueNode;
 import com.oracle.truffle.js.nodes.interop.ExportValueNodeGen;
 import com.oracle.truffle.js.nodes.interop.ImportValueNode;
@@ -72,6 +74,7 @@ final class JSArgumentsObjectGen {
             private final Class<? extends JSArgumentsObject> receiverClass_;
             @CompilationFinal private volatile int state_;
             @Child private KeyInfoNode keyInfo;
+            @Child private ArrayElementInfoNode elementInfo;
             @CompilationFinal private LanguageReference<JavaScriptLanguage> javaScriptLanguageReference_;
             @CompilationFinal private ContextReference<JSRealm> javaScriptLanguageContextReference_;
             @Child private ReadElementNode readMemberNode__readNode_;
@@ -620,11 +623,11 @@ final class JSArgumentsObjectGen {
                 assert assertAdopted();
                 JSArgumentsObject arg0Value = CompilerDirectives.castExact(arg0Value_, receiverClass_);
                 int state = state_;
-                if ((state & 0b100000000000) != 0 /* is-active writeArrayElement(JSArgumentsObject, long, Object, KeyInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */) {
+                if ((state & 0b100000000000) != 0 /* is-active writeArrayElement(JSArgumentsObject, long, Object, ArrayElementInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */) {
                     {
                         LanguageReference<JavaScriptLanguage> javaScriptLanguageReference__ = this.javaScriptLanguageReference_;
                         LanguageReference<JavaScriptLanguage> writeArrayElementNode__languageRef__ = javaScriptLanguageReference__;
-                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.keyInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
+                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.elementInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
                         return;
                     }
                 }
@@ -641,8 +644,8 @@ final class JSArgumentsObjectGen {
                 try {
                     {
                         LanguageReference<JavaScriptLanguage> writeArrayElementNode__languageRef__ = null;
-                        if (this.keyInfo == null) {
-                            this.keyInfo = super.insert((KeyInfoNodeGen.create()));
+                        if (this.elementInfo == null) {
+                            this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
                         }
                         this.writeArrayElementNode__castValueNode_ = super.insert((ImportValueNode.create()));
                         LanguageReference<JavaScriptLanguage> javaScriptLanguageReference__1 = this.javaScriptLanguageReference_;
@@ -651,10 +654,10 @@ final class JSArgumentsObjectGen {
                         }
                         writeArrayElementNode__languageRef__ = javaScriptLanguageReference__1;
                         this.writeArrayElementNode__writeNode_ = super.insert((WriteElementNode.createCachedInterop(writeArrayElementNode__languageRef__)));
-                        this.state_ = state = state | 0b100000000000 /* add-active writeArrayElement(JSArgumentsObject, long, Object, KeyInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */;
+                        this.state_ = state = state | 0b100000000000 /* add-active writeArrayElement(JSArgumentsObject, long, Object, ArrayElementInfoNode, ImportValueNode, LanguageReference<JavaScriptLanguage>, WriteElementNode) */;
                         lock.unlock();
                         hasLock = false;
-                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.keyInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
+                        arg0Value.writeArrayElement(arg1Value, arg2Value, this.elementInfo, this.writeArrayElementNode__castValueNode_, writeArrayElementNode__languageRef__, this.writeArrayElementNode__writeNode_);
                         return;
                     }
                 } finally {
@@ -670,8 +673,8 @@ final class JSArgumentsObjectGen {
                 assert assertAdopted();
                 JSArgumentsObject arg0Value = CompilerDirectives.castExact(arg0Value_, receiverClass_);
                 int state = state_;
-                if ((state & 0b1000000000000) != 0 /* is-active isArrayElementModifiable(JSArgumentsObject, long, KeyInfoNode) */) {
-                    return arg0Value.isArrayElementModifiable(arg1Value, this.keyInfo);
+                if ((state & 0b1000000000000) != 0 /* is-active isArrayElementModifiable(JSArgumentsObject, long, ArrayElementInfoNode) */) {
+                    return arg0Value.isArrayElementModifiable(arg1Value, this.elementInfo);
                 }
                 CompilerDirectives.transferToInterpreterAndInvalidate();
                 return isArrayElementModifiableNode_AndSpecialize(arg0Value, arg1Value);
@@ -683,13 +686,13 @@ final class JSArgumentsObjectGen {
                 lock.lock();
                 int state = state_;
                 try {
-                    if (this.keyInfo == null) {
-                        this.keyInfo = super.insert((KeyInfoNodeGen.create()));
+                    if (this.elementInfo == null) {
+                        this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
                     }
-                    this.state_ = state = state | 0b1000000000000 /* add-active isArrayElementModifiable(JSArgumentsObject, long, KeyInfoNode) */;
+                    this.state_ = state = state | 0b1000000000000 /* add-active isArrayElementModifiable(JSArgumentsObject, long, ArrayElementInfoNode) */;
                     lock.unlock();
                     hasLock = false;
-                    return arg0Value.isArrayElementModifiable(arg1Value, this.keyInfo);
+                    return arg0Value.isArrayElementModifiable(arg1Value, this.elementInfo);
                 } finally {
                     if (hasLock) {
                         lock.unlock();
@@ -703,8 +706,8 @@ final class JSArgumentsObjectGen {
                 assert assertAdopted();
                 JSArgumentsObject arg0Value = CompilerDirectives.castExact(arg0Value_, receiverClass_);
                 int state = state_;
-                if ((state & 0b10000000000000) != 0 /* is-active isArrayElementInsertable(JSArgumentsObject, long, KeyInfoNode) */) {
-                    return arg0Value.isArrayElementInsertable(arg1Value, this.keyInfo);
+                if ((state & 0b10000000000000) != 0 /* is-active isArrayElementInsertable(JSArgumentsObject, long, ArrayElementInfoNode) */) {
+                    return arg0Value.isArrayElementInsertable(arg1Value, this.elementInfo);
                 }
                 CompilerDirectives.transferToInterpreterAndInvalidate();
                 return isArrayElementInsertableNode_AndSpecialize(arg0Value, arg1Value);
@@ -716,13 +719,13 @@ final class JSArgumentsObjectGen {
                 lock.lock();
                 int state = state_;
                 try {
-                    if (this.keyInfo == null) {
-                        this.keyInfo = super.insert((KeyInfoNodeGen.create()));
+                    if (this.elementInfo == null) {
+                        this.elementInfo = super.insert((ArrayElementInfoNodeGen.create()));
                     }
-                    this.state_ = state = state | 0b10000000000000 /* add-active isArrayElementInsertable(JSArgumentsObject, long, KeyInfoNode) */;
+                    this.state_ = state = state | 0b10000000000000 /* add-active isArrayElementInsertable(JSArgumentsObject, long, ArrayElementInfoNode) */;
                     lock.unlock();
                     hasLock = false;
-                    return arg0Value.isArrayElementInsertable(arg1Value, this.keyInfo);
+                    return arg0Value.isArrayElementInsertable(arg1Value, this.elementInfo);
                 } finally {
                     if (hasLock) {
                         lock.unlock();
@@ -932,7 +935,7 @@ final class JSArgumentsObjectGen {
             public void writeArrayElement(Object arg0Value_, long arg1Value, Object arg2Value) throws InvalidArrayIndexException, UnsupportedMessageException {
                 assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 JSArgumentsObject arg0Value = ((JSArgumentsObject) arg0Value_);
-                arg0Value.writeArrayElement(arg1Value, arg2Value, (KeyInfoNodeGen.getUncached()), (ImportValueNodeGen.getUncached()), this.javaScriptLanguageReference_, (JSObject.getUncachedWrite()));
+                arg0Value.writeArrayElement(arg1Value, arg2Value, (ArrayElementInfoNodeGen.getUncached()), (ImportValueNodeGen.getUncached()), this.javaScriptLanguageReference_, (JSObject.getUncachedWrite()));
                 return;
             }
 
@@ -941,7 +944,7 @@ final class JSArgumentsObjectGen {
             public boolean isArrayElementModifiable(Object arg0Value_, long arg1Value) {
                 assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 JSArgumentsObject arg0Value = ((JSArgumentsObject) arg0Value_);
-                return arg0Value.isArrayElementModifiable(arg1Value, (KeyInfoNodeGen.getUncached()));
+                return arg0Value.isArrayElementModifiable(arg1Value, (ArrayElementInfoNodeGen.getUncached()));
             }
 
             @TruffleBoundary
@@ -949,7 +952,7 @@ final class JSArgumentsObjectGen {
             public boolean isArrayElementInsertable(Object arg0Value_, long arg1Value) {
                 assert this.accepts(arg0Value_) : "Invalid library usage. Library does not accept given receiver.";
                 JSArgumentsObject arg0Value = ((JSArgumentsObject) arg0Value_);
-                return arg0Value.isArrayElementInsertable(arg1Value, (KeyInfoNodeGen.getUncached()));
+                return arg0Value.isArrayElementInsertable(arg1Value, (ArrayElementInfoNodeGen.getUncached()));
             }
 
         }
