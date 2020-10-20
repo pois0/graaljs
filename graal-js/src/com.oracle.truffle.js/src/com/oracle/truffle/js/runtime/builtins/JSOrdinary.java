@@ -81,7 +81,7 @@ public final class JSOrdinary extends JSNonProxy implements PrototypeSupplier {
     public static DynamicObject createWithRealm(JSContext context, JSObjectFactory factory, JSRealm realm) {
         DynamicObject obj = JSOrdinaryObject.create(factory.getShape(realm));
         factory.initProto(obj, realm);
-        return context.trackAllocation(obj);
+        return context.trackAllocation(obj); // almost same to (return obj);
     }
 
     public static DynamicObject create(JSContext context, JSRealm realm) {

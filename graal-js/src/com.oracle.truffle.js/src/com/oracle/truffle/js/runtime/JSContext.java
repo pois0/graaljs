@@ -61,6 +61,7 @@ import com.oracle.truffle.api.TruffleLanguage.ContextReference;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.AllocationReporter;
+import com.oracle.truffle.api.instrumentation.ObjectTracker;
 import com.oracle.truffle.api.interop.ArityException;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
@@ -68,6 +69,7 @@ import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.nodes.InvalidAssumptionException;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
+import com.oracle.truffle.api.object.Property;
 import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.js.lang.JavaScriptLanguage;
@@ -317,6 +319,7 @@ public class JSContext {
 
     private final ContextReference<JSRealm> contextRef;
     @CompilationFinal private AllocationReporter allocationReporter;
+    @CompilationFinal private ObjectTracker objectTracker;
 
     private final JSContextOptions contextOptions;
 
@@ -1199,6 +1202,27 @@ public class JSContext {
             reporter.onReturnValue(object, 0, AllocationReporter.SIZE_UNKNOWN);
         }
         return object;
+    }
+
+    void setObjectTracker(TruffleLanguage.Env env) {
+        CompilerAsserts.neverPartOfCompilation();
+        this.objectTracker = env.lookup(ObjectTracker.class);
+    }
+
+    public final ObjectTracker getObjectTracker() {
+        assert realmInit.get() == REALM_INITIALIZED : "getObjectTracker() during Realm initialization";
+        return objectTracker;
+    }
+
+    public final void trackAssignment(Object object, Object key, Object value) {
+        ObjectTracker tracker = getObjectTracker();
+        if (tracker != null) {
+            tracker.notifyAssignment(object, key, value);
+        }
+    }
+
+    public final void trackAssignment(Object object, Property property, Object value) {
+        trackAssignment(object, property.getKey(), value);
     }
 
     public boolean isOptionAnnexB() {
