@@ -417,6 +417,7 @@ public class JSContext {
 
         if (env != null) { // env could still be null
             setAllocationReporter(env);
+            setObjectTracker(env);
             this.contextOptions.setOptionValues(env.getOptions());
         }
 
