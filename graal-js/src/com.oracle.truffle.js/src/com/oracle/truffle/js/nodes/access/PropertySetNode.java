@@ -392,6 +392,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setInt(store, value, receiverCheck.getShape());
+                context.trackAssignment(thisObj, property, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -457,6 +458,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setDouble(store, value, receiverCheck.getShape());
+                context.trackAssignment(thisObj, key, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -468,6 +470,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setDouble(store, value, receiverCheck.getShape());
+                context.trackAssignment(thisObj, key, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -514,6 +517,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setBoolean(store, value, receiverCheck.getShape());
+                context.trackAssignment(thisObj, property, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -671,7 +675,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedObject(store, value, resolved)) {
-                        context.trackAssignment(thisObj, cache.property, value);
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -691,10 +695,13 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedInt(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedDouble(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedObject(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -714,8 +721,10 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedDouble(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedObject(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -735,8 +744,10 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedBoolean(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedObject(store, value, resolved)) {
+                        context.trackAssignment(thisObj, resolved.property, value);
                         return true;
                     }
                 }

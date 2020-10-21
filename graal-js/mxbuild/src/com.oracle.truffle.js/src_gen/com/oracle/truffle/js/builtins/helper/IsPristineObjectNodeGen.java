@@ -140,6 +140,16 @@ public final class IsPristineObjectNodeGen extends IsPristineObjectNode {
         return NodeCost.POLYMORPHIC;
     }
 
+    void removeDynamic_() {
+        Lock lock = getLock();
+        lock.lock();
+        try {
+            this.state_ = this.state_ & 0xfffffffd /* remove-active doDynamic(DynamicObject) */;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     void removeCached_(Object s1_) {
         Lock lock = getLock();
         lock.lock();
@@ -161,16 +171,6 @@ public final class IsPristineObjectNodeGen extends IsPristineObjectNode {
             if (this.cached_cache == null) {
                 this.state_ = this.state_ & 0xfffffffe /* remove-active doCached(DynamicObject, Shape, boolean) */;
             }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    void removeDynamic_() {
-        Lock lock = getLock();
-        lock.lock();
-        try {
-            this.state_ = this.state_ & 0xfffffffd /* remove-active doDynamic(DynamicObject) */;
         } finally {
             lock.unlock();
         }
