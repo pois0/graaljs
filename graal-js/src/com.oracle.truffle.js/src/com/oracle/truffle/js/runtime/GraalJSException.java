@@ -577,6 +577,11 @@ public abstract class GraalJSException extends RuntimeException implements Truff
         }
 
         @TruffleBoundary
+        public SourceSection getSourceSection() {
+            return sourceSection;
+        }
+
+        @TruffleBoundary
         public String getTypeName(boolean checkGlobal) {
             if (inNashornMode) {
                 return "<" + fileName + ">";
