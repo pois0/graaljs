@@ -318,7 +318,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 DynamicObject store = receiverCheck.getStore(thisObj);
                 try {
                     property.set(store, value, receiverCheck.getShape());
-                    context.trackAssignment(thisObj, property, value);
+                    context.recordObjectChange(thisObj, property, value);
                 } catch (IncompatibleLocationException | FinalLocationException e) {
                     throw Errors.shouldNotReachHere(e);
                 }
@@ -350,7 +350,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         protected boolean setValue(Object thisObj, Object value, Object receiver, PropertySetNode root, boolean guard) {
             DynamicObject store = receiverCheck.getStore(thisObj);
             boolean ret = ((PropertyProxy) property.get(store, guard)).set(store, value);
-            context.trackAssignment(thisObj, property, value);
+            context.recordObjectChange(thisObj, property, value);
             if (!ret && isStrict) {
                 errorBranch.enter();
                 throw Errors.createTypeErrorNotWritableProperty(property.getKey(), thisObj);
@@ -377,7 +377,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 DynamicObject store = receiverCheck.getStore(thisObj);
                 try {
                     property.set(store, value, receiverCheck.getShape());
-                    context.trackAssignment(thisObj, property, value);
+                    context.recordObjectChange(thisObj, property, value);
                 } catch (IncompatibleLocationException | FinalLocationException e) {
                     throw Errors.shouldNotReachHere(e);
                 }
@@ -392,7 +392,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setInt(store, value, receiverCheck.getShape());
-                context.trackAssignment(thisObj, property, value);
+                context.recordObjectChange(thisObj, property, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -446,7 +446,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setDouble(store, doubleValue, receiverCheck.getShape());
-                context.trackAssignment(thisObj, key, value);
+                context.recordObjectChange(thisObj, key, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -458,7 +458,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setDouble(store, value, receiverCheck.getShape());
-                context.trackAssignment(thisObj, key, value);
+                context.recordObjectChange(thisObj, key, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -470,7 +470,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setDouble(store, value, receiverCheck.getShape());
-                context.trackAssignment(thisObj, key, value);
+                context.recordObjectChange(thisObj, key, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -502,7 +502,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                 DynamicObject store = receiverCheck.getStore(thisObj);
                 try {
                     property.set(store, value, receiverCheck.getShape());
-                    context.trackAssignment(thisObj, property, value);
+                    context.recordObjectChange(thisObj, property, value);
                 } catch (IncompatibleLocationException | FinalLocationException e) {
                     throw Errors.shouldNotReachHere(e);
                 }
@@ -517,7 +517,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             DynamicObject store = receiverCheck.getStore(thisObj);
             try {
                 location.setBoolean(store, value, receiverCheck.getShape());
-                context.trackAssignment(thisObj, property, value);
+                context.recordObjectChange(thisObj, property, value);
                 return true;
             } catch (FinalLocationException e) {
                 throw Errors.shouldNotReachHere(e);
@@ -675,7 +675,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedObject(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -695,13 +695,13 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedInt(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedDouble(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedObject(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -721,10 +721,10 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedDouble(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedObject(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -744,10 +744,10 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
                         break;
                     }
                     if (setCachedBoolean(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     } else if (setCachedObject(store, value, resolved)) {
-                        context.trackAssignment(thisObj, resolved.property, value);
+                        context.recordObjectChange(thisObj, resolved.property, value);
                         return true;
                     }
                 }
@@ -906,7 +906,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
             }
             assert res.acceptsValue(value);
             res.property.setSafe(obj, value, res.oldShape, res.newShape);
-            context.trackAssignment(obj, res.property, value);
+            context.recordObjectChange(obj, res.property, value);
             return true;
         }
 
@@ -1222,7 +1222,7 @@ public class PropertySetNode extends PropertyCacheNode<PropertySetNode.SetCacheN
         protected boolean setValue(Object thisObj, Object value, Object receiver, PropertySetNode root, boolean guard) {
             DynamicObject store = receiverCheck.getStore(thisObj);
             boolean ret = ((PropertyProxy) property.get(store, guard)).set(store, value);
-            context.trackAssignment(thisObj, property, value);
+            context.recordObjectChange(thisObj, property, value);
             if (!ret && isStrict) {
                 errorBranch.enter();
                 throw Errors.createTypeErrorNotWritableProperty(property.getKey(), thisObj);

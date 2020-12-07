@@ -170,6 +170,29 @@ public final class JSArray extends JSAbstractArray implements JSConstructorFacto
         DynamicObject obj = JSArrayObject.create(factory.getShape(realm), arrayType, array, site, length, usedLength, indexOffset, arrayOffset, holeCount);
         factory.initProto(obj, realm);
         assert isJSArray(obj);
+        if (array instanceof byte[]) {
+            byte[] objects = (byte[]) array;
+            for (int i = 0; i < length; i++) {
+                context.recordArrayChange(obj, i, objects[i]);
+            }
+        }
+        else if (array instanceof int[]) {
+            int[] objects = (int[]) array;
+            for (int i = 0; i < length; i++) {
+                context.recordArrayChange(obj, i, objects[i]);
+            }
+        } else if (array instanceof double[]) {
+            double[] objects = (double[]) array;
+            for (int i = 0; i < length; i++) {
+                context.recordArrayChange(obj, i, objects[i]);
+            }
+        }
+        if (array instanceof Object[]) {
+            Object[] objects = (Object[]) array;
+            for (int i = 0; i < length; i++) {
+                context.recordArrayChange(obj, i, objects[i]);
+            }
+        }
         return context.trackAllocation(obj);
     }
 

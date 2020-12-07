@@ -434,12 +434,14 @@ public class WriteElementNode extends JSTargetableNode {
             boolean guard = c.guard(target);
             if (guard) {
                 c.executeWithTargetAndIndexUnguarded(target, index, value, receiver, this);
+                context.recordObjectChange(target, index, value);
                 return;
             }
         }
         CompilerDirectives.transferToInterpreterAndInvalidate();
         WriteElementTypeCacheNode specialization = specialize(target);
         specialization.executeWithTargetAndIndexUnguarded(target, index, value, receiver, this);
+        context.recordObjectChange(target, index, value);
     }
 
     @ExplodeLoop
@@ -448,12 +450,14 @@ public class WriteElementNode extends JSTargetableNode {
             boolean guard = c.guard(target);
             if (guard) {
                 c.executeWithTargetAndIndexUnguarded(target, index, value, receiver, this);
+                context.recordObjectChange(target, index, value);
                 return;
             }
         }
         CompilerDirectives.transferToInterpreterAndInvalidate();
         WriteElementTypeCacheNode specialization = specialize(target);
         specialization.executeWithTargetAndIndexUnguarded(target, index, value, receiver, this);
+        context.recordObjectChange(target, index, value);
     }
 
     private WriteElementTypeCacheNode specialize(Object target) {

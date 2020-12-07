@@ -1215,15 +1215,19 @@ public class JSContext {
         return objectTracker;
     }
 
-    public final void trackAssignment(Object object, Object key, Object value) {
+    public final void recordObjectChange(Object object, Object key, Object value) {
         ObjectTracker tracker = getObjectTracker();
         if (tracker != null) {
             tracker.notifyAssignment(object, key, value);
         }
     }
 
-    public final void trackAssignment(Object object, Property property, Object value) {
-        trackAssignment(object, property.getKey(), value);
+    public final void recordObjectChange(Object object, Property property, Object value) {
+        recordObjectChange(object, property.getKey(), value);
+    }
+
+    public final void recordArrayChange(Object object, int index, Object value) {
+        recordObjectChange(object, index, value);
     }
 
     public boolean isOptionAnnexB() {

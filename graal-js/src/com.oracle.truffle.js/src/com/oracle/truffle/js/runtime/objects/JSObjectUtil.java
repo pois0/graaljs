@@ -155,7 +155,7 @@ public final class JSObjectUtil {
     public static void defineDataProperty(JSContext context, DynamicObject thisObj, Object key, Object value, int flags) {
         checkForNoSuchPropertyOrMethod(context, key);
         DynamicObjectLibrary.getUncached().putWithFlags(thisObj, key, value, flags);
-        context.trackAssignment(thisObj, key, value);
+        context.recordObjectChange(thisObj, key, value);
     }
 
     @TruffleBoundary
@@ -211,7 +211,7 @@ public final class JSObjectUtil {
 
         checkForNoSuchPropertyOrMethod(context, key);
         DynamicObjectLibrary.getUncached().putConstant(thisObj, key, value, flags);
-        context.trackAssignment(thisObj, key, value);
+        context.recordObjectChange(thisObj, key, value);
     }
 
     public static void putConstructorProperty(JSContext context, DynamicObject prototype, DynamicObject constructor) {
